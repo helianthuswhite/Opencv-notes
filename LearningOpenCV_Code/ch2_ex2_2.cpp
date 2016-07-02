@@ -29,18 +29,12 @@
 */
 #include <opencv2/highgui.hpp>
 
-#define IMG1 "/Users/W_littlewhite/Documents/Xcode Project/Xcode Project/LearningOpenCV_Code/HandOutdoorColor.jpg"
-
-#define IMG2 "/Users/W_littlewhite/Documents/Xcode Project/Xcode Project/LearningOpenCV_Code/fruits.jpg"
-
-#define VIDEO "/Users/W_littlewhite/Documents/Xcode Project/Xcode Project/LearningOpenCV_Code/tree.avi"
-
 int main( int argc, char** argv ) {
     //创建窗口
     cvNamedWindow( "Example2", CV_WINDOW_AUTOSIZE );
 //    获取要读入的avi文件
     //CvCapture* capture = cvCaptureFromAVI( argv[1] ); // either one will work
-    CvCapture* capture = cvCreateFileCapture( VIDEO );
+    CvCapture* capture = cvCreateFileCapture( VIDEO1);
 //    创建图片指针
     IplImage* frame;
     while(1) {
