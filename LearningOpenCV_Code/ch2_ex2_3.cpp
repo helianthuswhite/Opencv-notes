@@ -21,18 +21,23 @@
      http://tech.groups.yahoo.com/group/OpenCV/
    * The minutes of weekly OpenCV development meetings are at:
      http://pr.willowgarage.com/wiki/OpenCV
-*/
-#include <stdio.h>
+//*/
+//#include <stdio.h>
 #include <iostream>
 #include <fstream>
-#include "cv.h"
-#include "highgui.h"
+#include "opencv/cv.h"
+#include "opencv2/highgui.hpp"
 /*
 OK, you caught us.  Video playback under linux is still just bad.  Part of this is due to FFMPEG, part of this
 is due to lack of standards in video files.  But the position slider here will often not work. We tried to at least
 find number of frames using the "getAVIFrames" hack below.  Terrible.  But, this file shows something of how to
 put a slider up and play with it.  Sorry.
 */
+#define IMG1 "/Users/W_littlewhite/Documents/Xcode Project/Xcode Project/LearningOpenCV_Code/HandOutdoorColor.jpg"
+
+#define IMG2 "/Users/W_littlewhite/Documents/Xcode Project/Xcode Project/LearningOpenCV_Code/fruits.jpg"
+
+#define VIDEO "/Users/W_littlewhite/Documents/Xcode Project/Xcode Project/LearningOpenCV_Code/tree.avi"
 
 
 using namespace std;
@@ -70,7 +75,7 @@ int getAVIFrames(char * fname) {
 
 int main( int argc, char** argv ) {
     cvNamedWindow( "Example2_3", CV_WINDOW_AUTOSIZE );
-    g_capture = cvCreateFileCapture( argv[1] );
+    g_capture = cvCreateFileCapture(VIDEO );
     IplImage *foo = cvQueryFrame( g_capture);
 
 
@@ -91,7 +96,7 @@ int main( int argc, char** argv ) {
 
     printf("opencv frames %d w %d h %d\n",frames,tmpw,tmph);
 
-    frames = getAVIFrames(argv[1]); //This is a hack because on linux, getting number of frames often doesn't work
+    frames = getAVIFrames(VIDEO); //This is a hack because on linux, getting number of frames often doesn't work
 
     printf("hacked frames %d w %d h %d\n",frames,tmpw,tmph);
 

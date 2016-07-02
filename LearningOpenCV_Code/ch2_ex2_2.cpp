@@ -21,21 +21,41 @@
      http://tech.groups.yahoo.com/group/OpenCV/
    * The minutes of weekly OpenCV development meetings are at:
      http://pr.willowgarage.com/wiki/OpenCV
+ 
+    ADD ALL NOTES BY W_LITTLEWHITE
+    * The github is at:
+    https://github.com/964873559
+ 
 */
-#include "highgui.h"
+#include <opencv2/highgui.hpp>
 
-int main( int argc, char** argv ) { 
+#define IMG1 "/Users/W_littlewhite/Documents/Xcode Project/Xcode Project/LearningOpenCV_Code/HandOutdoorColor.jpg"
+
+#define IMG2 "/Users/W_littlewhite/Documents/Xcode Project/Xcode Project/LearningOpenCV_Code/fruits.jpg"
+
+#define VIDEO "/Users/W_littlewhite/Documents/Xcode Project/Xcode Project/LearningOpenCV_Code/tree.avi"
+
+int main( int argc, char** argv ) {
+    //创建窗口
     cvNamedWindow( "Example2", CV_WINDOW_AUTOSIZE );
+//    获取要读入的avi文件
     //CvCapture* capture = cvCaptureFromAVI( argv[1] ); // either one will work
-    CvCapture* capture = cvCreateFileCapture( argv[1] );
+    CvCapture* capture = cvCreateFileCapture( VIDEO );
+//    创建图片指针
     IplImage* frame;
     while(1) {
+//        将下一帧视频载入内存
         frame = cvQueryFrame( capture );
         if( !frame ) break;
+//        以单帧方式显示视频
         cvShowImage( "Example2", frame );
+//        每隔33ms等待一次，如果触发按键，则返回按键的ASCII码
         char c = cvWaitKey(33);
+//        当触发ESC键时退出循环
         if( c == 27 ) break;
     }
+//    释放CvCapture结构开辟的空间
     cvReleaseCapture( &capture );
+//    销毁窗口
     cvDestroyWindow( "Example2" );
 }
