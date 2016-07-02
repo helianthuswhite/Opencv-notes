@@ -25,15 +25,22 @@
     ADD ALL NOTES BY W_LITTLEWHITE
     * The github is at:
     https://github.com/964873559
+ 
 */
 #include <opencv2/highgui.hpp>
 
 int main( int argc, char** argv )
 {
+//    将图片加载至内存，并且根据图片的格式自动为图片的数据结构分配内存
   IplImage* img = cvLoadImage( argv[1] );
+//    highgui库中的函数，创建一个窗口，参数设置为窗口大小根据图片自动调整
   cvNamedWindow("Example1", CV_WINDOW_AUTOSIZE );
+//    将图片显示在窗口，第一个参数为显示的窗口，第二个为图片地址
   cvShowImage("Example1", img );
+//    使程序暂停，等待用户触发一个按键操作；正参数为等待ms输数，0或者负参数为一直等待
   cvWaitKey(0);
+//    释放为图片分配的内存
   cvReleaseImage( &img );
+//    销毁显示图像文件的窗口
   cvDestroyWindow("Example1");
 }
