@@ -21,15 +21,21 @@
      http://tech.groups.yahoo.com/group/OpenCV/
    * The minutes of weekly OpenCV development meetings are at:
      http://pr.willowgarage.com/wiki/OpenCV
+ 
+ 
+ ADD ALL NOTES BY W_LITTLEWHITE
+ * The github is at:
+ https://github.com/964873559
+
 */
 
-#include "cv.h"
+#include "opencv/cv.h"
 #include <stdio.h>
 
 int main()
 {
   // Create an OpenCV Matrix containing some fixed data.
-  //
+  //创建一个OPENCV矩阵并且填充数据
   float vals[] = { 0.866025, -0.500000, 0.500000, 0.866025};
    
   CvMat rotmat;

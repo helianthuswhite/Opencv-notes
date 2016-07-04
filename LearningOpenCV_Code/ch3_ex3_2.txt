@@ -1,12 +1,21 @@
 //Example 3-2. Matrix creation and release
+
+/*
+ADD ALL NOTES BY W_LITTLEWHITE
+* The github is at:
+https://github.com/964873559
+*/
+
 // Create a new rows by cols matrix of type ‘type’.
-//
+//通过列矩阵创建一行
 CvMat* cvCreateMat( int rows, int cols, int type );
+
 // Create only matrix header without allocating data
-//
+//只创建矩阵头，不分配数据
 CvMat* cvCreateMatHeader( int rows, int cols, int type );
+
 // Initialize header on existing CvMat structure
-//
+//在已存在的CvMat结构体初始化头部
 CvMat* cvInitMatHeader(
    CvMat* mat,
    int   rows,
@@ -15,18 +24,21 @@ CvMat* cvInitMatHeader(
    void* data = NULL,
    int   step = CV_AUTOSTEP
 );
+
 // Like cvInitMatHeader() but allocates CvMat as well.
-//
+//分配数据的初始化头部
 CvMat cvMat(
    int   rows,
    int   cols,
    int   type,
    void* data = NULL
 );
+
 // Allocate a new matrix just like the matrix ‘mat’.
-//
+//分配一个新的矩阵，指针为mat
 CvMat* cvCloneMat( const cvMat* mat );
+
 // Free the matrix ‘mat’, both header and data.
-//
+//释放一个矩阵at，包括头部和数据
 void cvReleaseMat( CvMat** mat );
 

@@ -21,11 +21,18 @@
      http://tech.groups.yahoo.com/group/OpenCV/
    * The minutes of weekly OpenCV development meetings are at:
      http://pr.willowgarage.com/wiki/OpenCV
+ 
+ ADD ALL NOTES BY W_LITTLEWHITE
+ * The github is at:
+ https://github.com/964873559
+ 
+
 */
 
-#include "cv.h"
-#include "highgui.h"
+#include "opencv/cv.h"
+#include "opencv2/highgui.hpp"
 
+//图像的边缘检测
 IplImage* doCanny(
     IplImage* in,
     double    lowThresh,
@@ -40,6 +47,7 @@ IplImage* doCanny(
     return( out );
 };
 
+//图像的缩放
 IplImage* doPyrDown(
   IplImage* in,
   int       filter = IPL_GAUSSIAN_5x5)
@@ -47,7 +55,7 @@ IplImage* doPyrDown(
 
     // Best to make sure input image is divisible by two.
     //
-    assert( in->width%2 == 0 && in->height%2 == 0 );
+//    assert( in->width%2 == 0 && in->height%2 == 0 );
 
     IplImage* out = cvCreateImage( 
         cvSize( in->width/2, in->height/2 ),
@@ -60,12 +68,13 @@ IplImage* doPyrDown(
 
 int main( int argc, char** argv )
 {
+//    创建窗体
   cvNamedWindow("Example Gray", CV_WINDOW_AUTOSIZE );
   cvNamedWindow("Example Pyr", CV_WINDOW_AUTOSIZE );
   cvNamedWindow("Example Canny", CV_WINDOW_AUTOSIZE );
-  IplImage* img_rgb = cvLoadImage( argv[1] );
+  IplImage* img_rgb = cvLoadImage( IMG1 );
   IplImage* out;
-
+//释放内存简化
   out = cvCreateImage( cvSize( img_rgb->width,img_rgb->height ), img_rgb->depth, 1);
   cvCvtColor(img_rgb, out ,CV_BGR2GRAY);
   cvShowImage("Example Gray", out );

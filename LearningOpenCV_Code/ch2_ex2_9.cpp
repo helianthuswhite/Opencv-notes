@@ -21,28 +21,41 @@
      http://tech.groups.yahoo.com/group/OpenCV/
    * The minutes of weekly OpenCV development meetings are at:
      http://pr.willowgarage.com/wiki/OpenCV
-*/
-#include "cv.h"
-#include "highgui.h"
+ 
+ ADD ALL NOTES BY W_LITTLEWHITE
+ * The github is at:
+ https://github.com/964873559
+ 
 
-int main( int argc, char** argv ) { 
+*/
+#include "opencv/cv.h"
+#include "opemcv2/highgui.hpp"
+
+int main( int argc, char** argv ) {
+//    创建窗体
     cvNamedWindow( "Example2_9", CV_WINDOW_AUTOSIZE );
     CvCapture* capture;
     if (argc==1) {
+//        从摄像头获取图像
         capture = cvCreateCameraCapture( 0 );
     } else {
-        capture = cvCreateFileCapture( argv[1] );
+//        从视频文件获取图像
+        capture = cvCreateFileCapture( VIDEO1 );
     }
     assert( capture != NULL );
 
     IplImage* frame;
     while(1) {
+//        显示获取的图像
         frame = cvQueryFrame( capture );
         if( !frame ) break;
         cvShowImage( "Example2_9", frame );
+//        等待10ms一次循环
         char c = cvWaitKey(10);
+//        当按下ESC键退出
         if( c == 27 ) break;
     }
+//    释放内存并销毁窗体
     cvReleaseCapture( &capture );
     cvDestroyWindow( "Example2_9" );
 }

@@ -21,9 +21,15 @@
      http://tech.groups.yahoo.com/group/OpenCV/
    * The minutes of weekly OpenCV development meetings are at:
      http://pr.willowgarage.com/wiki/OpenCV
+ 
+ 
+ ADD ALL NOTES BY W_LITTLEWHITE
+ * The github is at:
+ https://github.com/964873559
+
 */
-#include "cv.h"
-#include "highgui.h"
+#include "opencv/cv.h"
+#include "opencv2/highgui.hpp"
 
 IplImage* doPyrDown(
   IplImage* in,
@@ -32,27 +38,34 @@ IplImage* doPyrDown(
 
     // Best to make sure input image is divisible by two.
     //
-    assert( in->width%2 == 0 && in->height%2 == 0 );
-
-    IplImage* out = cvCreateImage( 
+//    assert( in->width%2 == 0 && in->height%2 == 0 );
+//    创建图像，三个参数，大小，数据结构，通道
+    IplImage* out = cvCreateImage(
         cvSize( in->width/2, in->height/2 ),
         in->depth,
         in->nChannels
     );
+//    图像缩放处理
     cvPyrDown( in, out );
     return( out );
 };
 
 int main( int argc, char** argv )
 {
-  IplImage* img = cvLoadImage( argv[1] );
+//    加载图像
+  IplImage* img = cvLoadImage( IMG1 );
+//    创建缩小的图像
   IplImage* img2 = cvCreateImage( cvSize( img->width/2,img->height/2 ), img->depth, img->nChannels);
+//    创建窗体1和2
   cvNamedWindow("Example1", CV_WINDOW_AUTOSIZE );
   cvNamedWindow("Example2", CV_WINDOW_AUTOSIZE );
+//    显示图像
   cvShowImage("Example1", img );
+//    处理图像
   img2 = doPyrDown( img );
   cvShowImage("Example2", img2 );
   cvWaitKey(0);
+//    释放内存，销毁窗口
   cvReleaseImage( &img );
   cvReleaseImage( &img2 );
   cvDestroyWindow("Example1");

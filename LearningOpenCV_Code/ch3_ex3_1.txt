@@ -1,8 +1,16 @@
 //Example 3-1. CvMat structure: the matrix “header”
+
+/*
+ADD ALL NOTES BY W_LITTLEWHITE
+* The github is at:
+https://github.com/964873559
+*/
+
+//CvMat结构：矩阵头
 typedef struct CvMat {
     int type;
     int step;
-    int* refcount;     // for internal use only
+    int* refcount;     // 只能内部使用的
     union {
          uchar* ptr;
          short* s;
