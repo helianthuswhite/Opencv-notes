@@ -1,14 +1,22 @@
 //Example 3-10. IplImage header structure
+
+/*
+ADD ALL NOTES BY W_LITTLEWHITE
+* The github is at:
+https://github.com/964873559
+*/
+
+
 typedef struct _IplImage {
-  int                  nSize;
+  int                  nSize; //
   int                  ID;
-  int                  nChannels;
+  int                  nChannels; //通道数可能取值为1、2、3、4
   int                  alphaChannel;
   int                  depth;
   char                 colorModel[4];
   char                 channelSeq[4];
-  int                  dataOrder;
-  int                  origin;
+  int                  dataOrder; //像素通道值的排序方式
+  int                  origin; //设置坐标原点位置
   int                  align;
   int                  width;
   int                  height;
@@ -17,7 +25,7 @@ typedef struct _IplImage {
   void*                imageId;
   struct _IplTileInfo* tileInfo;
   int                  imageSize;
-  char*                imageData;
+  char*                imageData; //指向第一行图像数据的指针
   int                  widthStep;
   int                  BorderMode[4];
   int                  BorderConst[4];

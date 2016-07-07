@@ -32,9 +32,12 @@
 #include "opencv/cv.h"
 #include <stdio.h>
 
+//通过简单的CV_MAT_ELEM宏存取矩阵
 int main()
 {
+//    创建矩阵，传入行数和列数以及数据类型
   CvMat* mat = cvCreateMat( 5, 5, CV_32FC1 );
+//    获取到矩阵的元素，参数为矩阵、元素类型、行数和列数
   float element_3_2 = CV_MAT_ELEM( *mat, float, 3, 2 );
   printf("Exercise 3_4, matrix created and accessed [3,2]=%f\n",element_3_2);
 }

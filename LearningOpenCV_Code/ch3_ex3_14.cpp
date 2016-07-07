@@ -21,30 +21,43 @@
      http://tech.groups.yahoo.com/group/OpenCV/
    * The minutes of weekly OpenCV development meetings are at:
      http://pr.willowgarage.com/wiki/OpenCV
+ 
+ 
+ ADD ALL NOTES BY W_LITTLEWHITE
+ * The github is at:
+ https://github.com/964873559
+
 */
 
 // alphablend <imageA> <image B> <x> <y> <width> <height> 
 //            <alpha> <beta>
-#include <cv.h>
-#include <highgui.h>
+#include <opencv/cv.h>
+#include <opencv2/highgui.hpp>
 #include <stdio.h>
 
+//通过alpha将src2融合到src1
 int main(int argc, char** argv)
 {
+//    加载图片
     IplImage *src1, *src2;
-    if( argc == 9 && ((src1=cvLoadImage(argv[1],1)) != 0 
-        )&&((src2=cvLoadImage(argv[2],1)) != 0 ))
+    if( ((src1=cvLoadImage(IMG1,1)) != 0)&&((src2=cvLoadImage(IMG2,1)) != 0 ))
     {
-        int x = atoi(argv[3]);
-        int y = atoi(argv[4]);
-        int width = atoi(argv[5]);
-        int height = atoi(argv[6]);
-        double alpha = (double)atof(argv[7]);
-        double beta  = (double)atof(argv[8]);
+//        修改参数
+        int x = 100;
+        int y = 100;
+        int width = 200;
+        int height = 200;
+//        融合度修改，alpha为src1融合度，beta为src2融合度，两者之和大于0小于1
+        double alpha = 0.1;
+        double beta  = 0.8;
+//        分别设置两个图像的ROI
         cvSetImageROI(src1, cvRect(x,y,width,height));
         cvSetImageROI(src2, cvRect(0,0,width,height));
+//        开始进行融合
         cvAddWeighted(src1, alpha, src2, beta,0.0,src1);
+//        刷新src1的ROI
         cvResetImageROI(src1);
+//        显示结果
         cvNamedWindow( "Alpha_blend", 1 );
         cvShowImage( "Alpha_blend", src1 );
         cvWaitKey();

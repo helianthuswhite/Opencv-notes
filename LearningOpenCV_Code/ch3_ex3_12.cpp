@@ -21,31 +21,49 @@
      http://tech.groups.yahoo.com/group/OpenCV/
    * The minutes of weekly OpenCV development meetings are at:
      http://pr.willowgarage.com/wiki/OpenCV
+ 
+ 
+ ADD ALL NOTES BY W_LITTLEWHITE
+ * The github is at:
+ https://github.com/964873559
+ 
 */
 
-#include <cv.h>
-#include <highgui.h>
-// ch3_ex3_12 image_name x y width height add# 
+#include <opencv/cv.h>
+#include <opencv2/highgui.hpp>
+// ch3_ex3_12 image_name x y width height add#
+
+//利用imageROI来增加某范围的像素
 int main(int argc, char** argv)
 {
-
+//    创建窗体
     IplImage* src;
     cvNamedWindow("Example3_12_pre", CV_WINDOW_AUTOSIZE);
-    cvNamedWindow("Example3_12_post", CV_WINDOW_AUTOSIZE);  
-    if( argc == 7 && ((src=cvLoadImage(argv[1],1)) != 0 ))
+    cvNamedWindow("Example3_12_post", CV_WINDOW_AUTOSIZE);
+//    加载到图片
+    if((src=cvLoadImage(IMG1,1)) != 0 )
     {
-		int x = atoi(argv[2]);
-		int y = atoi(argv[3]);
-		int width = atoi(argv[4]);
-		int height = atoi(argv[5]);
-		int add = atoi(argv[6]);
+//        参数修改，写死，初始坐标x,y
+		int x = 0;
+		int y = 0;
+//        处理部分的宽和高
+		int width = 200;
+		int height = 200;
+//        需要增加的灰度值
+		int add = 100;
+//        显示图片
 		cvShowImage( "Example3_12_pre", src);
+//        设置ROI
 		cvSetImageROI(src, cvRect(x,y,width,height));
+//        增加S通道的灰度值
 		cvAddS(src, cvScalar(add),src);
+//        重新设置ROI
 		cvResetImageROI(src);
+//        显示修改后的图像
 		cvShowImage( "Example3_12_post",src);
       cvWaitKey();
     }
+//    后续工作
   cvReleaseImage( &src );
   cvDestroyWindow("Example3_12_pre");
   cvDestroyWindow("Example3_12_post");   

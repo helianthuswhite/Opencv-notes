@@ -21,31 +21,40 @@
      http://tech.groups.yahoo.com/group/OpenCV/
    * The minutes of weekly OpenCV development meetings are at:
      http://pr.willowgarage.com/wiki/OpenCV
+ 
+ 
+ ADD ALL NOTES BY W_LITTLEWHITE
+ * The github is at:
+ https://github.com/964873559
+ 
 */
 
-#include <cv.h>
-#include <highgui.h>
+#include <opencv/cv.h>
+#include <opencv2/highgui.hpp>
 
 // ch3_ex3_13 image_name x y width height add# 
 
+//利用widthStep方法将所有的像素值增加1
 int main(int argc, char** argv)
 {
+//    加载图片
     IplImage* interest_img;
     CvRect interest_rect;
-    if( argc == 7 && ((interest_img=cvLoadImage(argv[1],1)) != 0 ))
+    if((interest_img=cvLoadImage(IMG1,1)) != 0 )
     {
-        interest_rect.x = atoi(argv[2]);
-        interest_rect.y = atoi(argv[3]);
-        interest_rect.width = atoi(argv[4]);
-        interest_rect.height = atoi(argv[5]);
-        int add = atoi(argv[6]);
+//        参数修改
+        interest_rect.x = 100;
+        interest_rect.y = 100;
+        interest_rect.width = 200;
+        interest_rect.height = 200;
+        int add = 100;
 
         // Assuming IplImage *interest_img; and 
         //  CvRect interest_rect;
         //  Use widthStep to get a region of interest
         //
         // (Alternate method)
-        //
+        //创建新的图像头
         IplImage *sub_img = cvCreateImageHeader(
           cvSize(
              interest_rect.width, 
@@ -54,19 +63,19 @@ int main(int argc, char** argv)
           interest_img->depth, 
           interest_img->nChannels
         );
-        
+//        设定相同的初始位置
         sub_img->origin = interest_img->origin;
-        
+//        设定相同的行距
         sub_img->widthStep = interest_img->widthStep;
-        
-        sub_img->imageData = interest_img->imageData + 
+//        设置选取区域的头指针
+        sub_img->imageData = interest_img->imageData +
           interest_rect.y * interest_img->widthStep  +
           interest_rect.x * interest_img->nChannels;
-        
+//        更改选取区域的图片
         cvAddS( sub_img, cvScalar(add), sub_img );
-        
+//        释放头指针
         cvReleaseImageHeader(&sub_img);
-
+//        后续工作
         cvNamedWindow( "Roi_Add", CV_WINDOW_AUTOSIZE );
         cvShowImage( "Roi_Add", interest_img );
         cvWaitKey();

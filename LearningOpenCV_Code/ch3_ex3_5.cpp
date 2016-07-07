@@ -21,15 +21,24 @@
      http://tech.groups.yahoo.com/group/OpenCV/
    * The minutes of weekly OpenCV development meetings are at:
      http://pr.willowgarage.com/wiki/OpenCV
+ 
+ 
+ ADD ALL NOTES BY W_LITTLEWHITE
+ * The github is at:
+ https://github.com/964873559
+ 
+
 */
 
 
-#include "cv.h"
+#include "opencv/cv.h"
 #include <stdio.h>
 
 int main()
 {
+//    创建矩阵，行列类型
   CvMat* mat = cvCreateMat( 5, 5, CV_32FC1 );
+//    为矩阵设置一个数值
   float element_3_2 = 7.7;
   *( (float*)CV_MAT_ELEM_PTR( *mat, 3, 2 ) ) = element_3_2;
 

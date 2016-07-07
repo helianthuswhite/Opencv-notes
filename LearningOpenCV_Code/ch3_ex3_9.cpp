@@ -21,17 +21,26 @@
      http://tech.groups.yahoo.com/group/OpenCV/
    * The minutes of weekly OpenCV development meetings are at:
      http://pr.willowgarage.com/wiki/OpenCV
+ 
+ 
+ ADD ALL NOTES BY W_LITTLEWHITE
+ * The github is at:
+ https://github.com/964873559
+ 
 */
 
 #include <stdio.h>
-#include <cv.h>
-#include <highgui.h>
+#include <opencv/cv.h>
+#include <opencv2/highgui.hpp>
 
+//累加一个三通道矩阵中的所有元素
 float sum( CvMat* mat ) {
   float s = 0.0f;
   for( int row=0; row<mat->height; row++ ) {
+//      获取到单独行的指针
     float* ptr = mat->data.fl + row * mat->step/4;
     for( int col=0; col<mat->width; col++ ) {
+//        按行将每一行的元素相加
       s += *ptr++;
     }
   }
@@ -40,11 +49,14 @@ float sum( CvMat* mat ) {
 
 int main(int argc, char** argv)
 {
+//    创建一个矩阵
     CvMat *mat = cvCreateMat(5,5,CV_32FC1);
     float element_3_2 = 7.7;
+//    设定矩阵中某元素的值
     *((float*)CV_MAT_ELEM_PTR( *mat, 3,2) ) = element_3_2;
     cvmSet(mat,4,4,0.5000);
     cvSetReal2D(mat,3,3,0.5000);
+//    计算结果并打印
     float s = sum(mat);
     printf("%f\n",s);
     return 0;

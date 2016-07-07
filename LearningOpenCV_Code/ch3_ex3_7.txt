@@ -1,8 +1,17 @@
 //Example 3-7. CvMat and IplImage element functions
+
+/*
+ADD ALL NOTES BY W_LITTLEWHITE
+* The github is at:
+https://github.com/964873559
+*/
+
+//仅仅用来读数据
 double cvGetReal1D( const  CvArr* arr, int idx0 );
 double cvGetReal2D( const  CvArr* arr, int idx0, int idx1 );
 double cvGetReal3D( const  CvArr* arr, int idx0, int idx1, int idx2 );
 double cvGetRealND( const  CvArr* arr, int* idx );
+//该数据类型浪费空间，除非方便和高效，否则不推荐用以下方法
 CvScalar cvGet1D( const CvArr*  arr, int idx0 );
 CvScalar cvGet2D( const CvArr*  arr, int idx0, int idx1 );
 CvScalar cvGet3D( const CvArr*  arr, int idx0, int idx1, int idx2 );

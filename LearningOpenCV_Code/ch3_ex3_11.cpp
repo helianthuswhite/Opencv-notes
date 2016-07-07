@@ -21,17 +21,25 @@
      http://tech.groups.yahoo.com/group/OpenCV/
    * The minutes of weekly OpenCV development meetings are at:
      http://pr.willowgarage.com/wiki/OpenCV
+ 
+ 
+ ADD ALL NOTES BY W_LITTLEWHITE
+ * The github is at:
+ https://github.com/964873559
+
 */
 #include <stdio.h>
-#include <cv.h>
-#include <highgui.h>
+#include <opencv/cv.h>
+#include <opencv2/highgui.hpp>
 
+//最大化HSV图像中“S”和“V”的部分
 void saturate_sv( IplImage* img ) {
-
   for( int y=0; y<img->height; y++ ) {
+//      ptr指针指向y行起始位置
     uchar* ptr = (uchar*) (
       img->imageData + y * img->widthStep 
     );
+//      从指针中析出饱和度和高度在x维的值
     for( int x=0; x<img->width; x++ ) {
       ptr[3*x+1] = 255;
       ptr[3*x+2] = 255;
@@ -41,9 +49,12 @@ void saturate_sv( IplImage* img ) {
 
 int main( int argc, char** argv )
 {
-  IplImage* img = cvLoadImage( argv[1] );
+//    读取图像和创建窗体
+  IplImage* img = cvLoadImage( IMG1 );
   cvNamedWindow("Example1", CV_WINDOW_AUTOSIZE );
+//    处理图像
   saturate_sv(img);
+//    后续工作
   cvShowImage("Example1", img );
   cvWaitKey(0);
   cvReleaseImage( &img );
