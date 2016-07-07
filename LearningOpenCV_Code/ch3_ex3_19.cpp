@@ -34,37 +34,39 @@
 #include <opencv2/highgui.hpp>
 #include <stdio.h>
 
+//读入磁盘中的cfg.xml文件
 int main(int argc, char** argv)
 {
     printf("Example 3_19 Reading in cfg.xml\n");
+//    以读取方式打开文件
     CvFileStorage* fs = cvOpenFileStorage(
       "cfg.xml", 
       0, 
       CV_STORAGE_READ
     );
-
-    int frame_count = cvReadIntByName( 
+//    读取‘frame_count'，如果没有读到赋予默认值5
+    int frame_count = cvReadIntByName(
       fs, 
       0, 
       "frame_count", 
       5 /* default value */ 
     );
-
+//    获得结构体’frame_size'
     CvSeq* s = cvGetFileNodeByName(fs,0,"frame_size")->data.seq;
-
-    int frame_width = cvReadInt( 
+//    读入两个无名称整形数据
+    int frame_width = cvReadInt(
       (CvFileNode*)cvGetSeqElem(s,0) 
     );
 
     int frame_height = cvReadInt( 
       (CvFileNode*)cvGetSeqElem(s,1) 
     );
-
+//    读取矩阵
     CvMat* color_cvt_matrix = (CvMat*) cvRead(
       fs,
       0
     );
     printf("frame_count=%d, frame_width=%d, frame_height=%d\n",frame_count,frame_width,frame_height);
-
+//    释放文件指针
     cvReleaseFileStorage( &fs );
 }
