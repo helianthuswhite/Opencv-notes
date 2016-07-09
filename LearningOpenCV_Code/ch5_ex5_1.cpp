@@ -25,12 +25,18 @@
      http://tech.groups.yahoo.com/group/OpenCV/
    * The minutes of weekly OpenCV development meetings are at:
      http://pr.willowgarage.com/wiki/OpenCV
+ 
+ 
+ ADD ALL NOTES BY W_LITTLEWHITE
+ * The github is at:
+ https://github.com/964873559
+ 
+
    ************************************************** */
 
 #include <stdio.h>
-#include <cv.h>
-#include <highgui.h>
-#include <stdio.h>
+#include <opencv/cv.h>
+#include <opencv/highgui.hpp>
 
 void f( 
   IplImage* src, 
