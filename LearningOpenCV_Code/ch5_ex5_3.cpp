@@ -24,35 +24,49 @@
      http://tech.groups.yahoo.com/group/OpenCV/
    * The minutes of weekly OpenCV development meetings are at:
      http://pr.willowgarage.com/wiki/OpenCV
+ 
+ 
+ ADD ALL NOTES BY W_LITTLEWHITE
+ * The github is at:
+ https://github.com/964873559
+
    ************************************************** */
 
 #include <stdio.h>
-#include <cv.h>
-#include <highgui.h>
+#include <opencv/cv.h>
+#include <opencv2/highgui.hpp>
 
-
+//多通道组合的阈值化处理
 void sum_rgb( IplImage* src, IplImage* dst ) {
   // Allocate individual image planes.
+//    创建单通道图像
   IplImage* r = cvCreateImage( cvGetSize(src), IPL_DEPTH_8U, 1 );
   IplImage* g = cvCreateImage( cvGetSize(src), IPL_DEPTH_8U, 1 );
   IplImage* b = cvCreateImage( cvGetSize(src), IPL_DEPTH_8U, 1 );
 
   // Temporary storage.
+//    创建临时内存
   IplImage* s = cvCreateImage(cvGetSize(src), IPL_DEPTH_32F, 1);
       
   // Split image onto the color planes.
+//    分割原图至单通道
   cvSplit( src, r, g, b, NULL );
      
   //Accumulate separate planes, combine and threshold
+//    将临时内存的值都设为0
 	cvZero(s);
+//    将三个单通道加到临时图像中
 	cvAcc(b,s);
 	cvAcc(g,s);
 	cvAcc(r,s);
 	
 	//Truncate values above 100 and rescale into dst
+//    阈值处理
 	cvThreshold( s, s, 100, 100, CV_THRESH_TRUNC );
+//    线性变换处理数组，输入，输入出，比例因子，加数
 	cvConvertScale( s, dst, 1, 0 );
  
+//    释放内存
   cvReleaseImage( &r );
   cvReleaseImage( &g );   
   cvReleaseImage( &b );   
@@ -63,21 +77,27 @@ int main(int argc, char** argv)
 {
 
   // Create a named window with a the name of the file.
-  cvNamedWindow( argv[1], 1 );
+//    创建窗体
+  cvNamedWindow( IMG1, 1 );
 
   // Load the image from the given file name.
-  IplImage* src = cvLoadImage( argv[1] );
+//    加载图像
+  IplImage* src = cvLoadImage( IMG1 );
   IplImage* dst = cvCreateImage( cvGetSize(src), src->depth, 1);
+//    处理图像
   sum_rgb( src, dst);
 
   // Show the image in the named window
-  cvShowImage( argv[1], dst );
+//    展示图像
+  cvShowImage( IMG1, dst );
 
   // Idle until the user hits the "Esc" key.
+//    ESC键退出
   while( 1 ) { if( (cvWaitKey( 10 )&0x7f) == 27 ) break; }
 
   // Clean up and don’t be piggies
-  cvDestroyWindow( argv[1] );
+//    释放和清除
+  cvDestroyWindow( IMG1 );
   cvReleaseImage( &src );
   cvReleaseImage( &dst );
 

@@ -24,32 +24,44 @@
      http://tech.groups.yahoo.com/group/OpenCV/
    * The minutes of weekly OpenCV development meetings are at:
      http://pr.willowgarage.com/wiki/OpenCV
+ 
+ 
+ ADD ALL NOTES BY W_LITTLEWHITE
+ * The github is at:
+ https://github.com/964873559
+ 
    ************************************************** */
 
 #include <stdio.h>
-#include <cv.h>
-#include <highgui.h>
+#include <opencv/cv.h>
+#include <opencv2/highgui.hpp>
 
-
+//阈值处理
 void sum_rgb( IplImage* src, IplImage* dst ) {
   // Allocate individual image planes.
+//    创建单通道图像
   IplImage* r = cvCreateImage( cvGetSize(src), IPL_DEPTH_8U, 1 );
   IplImage* g = cvCreateImage( cvGetSize(src), IPL_DEPTH_8U, 1 );
   IplImage* b = cvCreateImage( cvGetSize(src), IPL_DEPTH_8U, 1 );
 
   // Temporary storage.
+//    创建临时内存区
   IplImage* s = cvCreateImage( cvGetSize(src), IPL_DEPTH_8U, 1 );
       
   // Split image onto the color planes.
+//    将原图分解到各个单通道
   cvSplit( src, r, g, b, NULL );
      
   // Add equally weighted rgb values.
+//    分割多通道数组成几个单通道数组或者从数组中提取一个通道
   cvAddWeighted( r, 1./3., g, 1./3., 0.0, s );
   cvAddWeighted( s, 2./3., b, 1./3., 0.0, s );
 
   // Truncate values above 100.
+//    阈值处理参数为：单通道原图像、输出图像、预设阈值、 使用 CV_THRESH_BINARY 和 CV_THRESH_BINARY_INV 的最大值、阈值类型
   cvThreshold( s, dst, 100, 100, CV_THRESH_TRUNC );
   
+//    释放内存
   cvReleaseImage( &r );
   cvReleaseImage( &g );   
   cvReleaseImage( &b );   
@@ -60,21 +72,27 @@ int main(int argc, char** argv)
 {
 
   // Create a named window with a the name of the file.
-  cvNamedWindow( argv[1], 1 );
+//    创建一个以参数命名的窗体
+  cvNamedWindow( IMG1, 1 );
 
   // Load the image from the given file name.
-  IplImage* src = cvLoadImage( argv[1] );
+//    加载图像
+  IplImage* src = cvLoadImage( IMG1 );
   IplImage* dst = cvCreateImage( cvGetSize(src), src->depth, 1);
+//    处理图像
   sum_rgb( src, dst);
 
   // Show the image in the named window
-  cvShowImage( argv[1], dst );
+//    显示图像
+  cvShowImage( IMG1, dst );
 
   // Idle until the user hits the "Esc" key.
+//    ESC退出
   while( 1 ) { if( (cvWaitKey( 10 )&0x7f) == 27 ) break; }
 
   // Clean up and don’t be piggies
-  cvDestroyWindow( argv[1] );
+//    释放清除
+  cvDestroyWindow( IMG1 );
   cvReleaseImage( &src );
   cvReleaseImage( &dst );
 
