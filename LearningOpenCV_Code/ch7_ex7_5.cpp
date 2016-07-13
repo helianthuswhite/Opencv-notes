@@ -43,6 +43,7 @@
 #include <opencv2/highgui.hpp>
 #include <stdio.h>
 
+//怎么又是这么长==大意就是说了一下这个方法需要注意的地方
 void help(){
 printf("\n"
 "Example of using cvMatchTemplate().  The call is:\n"
@@ -78,40 +79,46 @@ printf("\n"
 // matchTemplate template image 
 //
 // Will Display the results of the matchs
-// 
+// 通过模板来匹配图像
 int main( int argc, char** argv ) {
 
     IplImage *src, *templ,*ftmp[6]; //ftmp is what to display on
     int i;
     if( argc == 3){ 
 		//Read in the template to be used for matching:
+//        先读取模板
 		if((templ=cvLoadImage(argv[1], 1))== 0) {
 				printf("Error on reading template %s\n",argv[2]); help();
 				return(-1);
 		}
 
 		//Read in the source image to be searched:
+//        再读取要匹配的图像
 		if((src=cvLoadImage(argv[2], 1))== 0) {
 				printf("Error on reading src image %s\n",argv[i]); help();
 				return(-1);
 		}
-
  		int patchx = templ->width;
 		int patchy = templ->height;
 		int iwidth = src->width - patchx + 1;
 		int iheight = src->height - patchy + 1;
+//        创建6张图像来显示结果
 		for(i=0; i<6; ++i){
 			ftmp[i] = cvCreateImage( cvSize(iwidth,iheight),32,1);
 		}
 
 		//DO THE MATCHING OF THE TEMPLATE WITH THE IMAGE
+//        开始匹配
 		for(i=0; i<6; ++i){
-			cvMatchTemplate( src, templ, ftmp[i], i); 
+//            模板匹配函数，参数：原图像，模板，结果显示，匹配方法0-5
+			cvMatchTemplate( src, templ, ftmp[i], i);
 //		double min,max;
 //		cvMinMaxLoc(ftmp,&min,&max);
+//            归一化，使所有的结果显示具有一致性
 			cvNormalize(ftmp[i],ftmp[i],1,0,CV_MINMAX);
 		}
         //DISPLAY
+//        显示最终的结果
 		cvNamedWindow( "Template", 0 );
         cvShowImage(   "Template", templ );
         cvNamedWindow( "Image", 0 );

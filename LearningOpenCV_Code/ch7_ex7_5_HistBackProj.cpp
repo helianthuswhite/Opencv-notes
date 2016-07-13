@@ -3,9 +3,9 @@
 //     but here it is no extra charge.
 //   Gary Bradski Oct 3, 2008
 //
-#include <cv.h>
-#include <cxcore.h>
-#include <highgui.h>
+#include <opencv/cv.h>
+#include <opencv/cxcore.h>
+#include <opencv2/highgui.hpp>
 #include <stdio.h>
 /* *************** License:**************************
    Oct. 3, 2008
@@ -30,6 +30,12 @@
      http://tech.groups.yahoo.com/group/OpenCV/
    * The minutes of weekly OpenCV development meetings are at:
      http://pr.willowgarage.com/wiki/OpenCV
+ 
+ 
+ ADD ALL NOTES BY W_LITTLEWHITE
+ * The github is at:
+ https://github.com/964873559
+
    ************************************************** */
 
 void help(){
@@ -47,19 +53,22 @@ printf("\nCall is:\n"
 //  it does cvCalcBackProject().
 // Call is: 
 //    ch7BackProj modelImage testImage patch_type
-// 
+//
 int main( int argc, char** argv ) {
 
     IplImage* src[2],*dst=0,*ftmp=0; //dst is what to display on
 	int i,type = 0;
+//    默认匹配类型
 	int patch = 0; //default to cvCalcBackProject()
     if( argc >= 3){ 
 		if(argc > 3) {
 			patch = 1;
+//            反向投影时使用的匹配类型
 			type = atoi(argv[3]); //turn on cvCalcBackProjecPatch() using type
 		}
 		printf("Patch = %d, type = %d\n",patch,type);
 		//Load 2 images, first on is to build histogram of, 2nd is to run on
+//        加载两个图片，第一个作为直方图，第二个正常使用
 		src[0] = 0; src[1] = 0;
 		for(i = 1; i<3; ++i){
 			if((src[i-1]=cvLoadImage(argv[i], 1))== 0) {
@@ -69,7 +78,8 @@ int main( int argc, char** argv ) {
 		}
         // Compute the HSV image, and decompose it into separate planes.
         //
-        IplImage *hsv[2], *h_plane[2],*s_plane[2],*v_plane[2],*planes[2][2]; 
+//        下面是一大堆关于创建直方图的，还记得么
+        IplImage *hsv[2], *h_plane[2],*s_plane[2],*v_plane[2],*planes[2][2];
        	IplImage* hist_img[2];
 		CvHistogram* hist[2];
        // int h_bins = 30, s_bins = 32; 
@@ -81,16 +91,19 @@ int main( int argc, char** argv ) {
 		int scale = 10;
 #define patchx 61
 #define patchy 61
+//        创建匹配结果显示图像
 		if(patch){
 			int iwidth = src[1]->width - patchx + 1;
 			int iheight = src[1]->height - patchy + 1;
 			ftmp = cvCreateImage( cvSize(iwidth,iheight),32,1);
 			cvZero(ftmp);
 		}
+        
 		dst = cvCreateImage( cvGetSize(src[1]),8,1);
 
 		cvZero(dst);
- 		for(i = 0; i<2; ++i){ 
+//        创建直方图，前面有的，记得的话我就不注释了啊，不记得的话回去看看前面的：）
+ 		for(i = 0; i<2; ++i){
 			hsv[i] = cvCreateImage( cvGetSize(src[i]), 8, 3 ); 
         	cvCvtColor( src[i], hsv[i], CV_BGR2HSV );
 
@@ -144,17 +157,21 @@ int main( int argc, char** argv ) {
 		}//For the 2 images
 
 		//DO THE BACK PROJECTION
+//        执行反向投影匹配以及反向投影处理
 		if((patch)) {
 			printf("Doing cvCalcBackProjectPatch() with type =%d\n",type);
+//            参数：原图像、结果图像、匹配窗大小、直方图维度、匹配类型、归一化后的数值
 			cvCalcBackProjectPatch(planes[1],ftmp,cvSize(61,61),hist[0],type,1.0);
 			printf("ftmp count = %d\n",cvCountNonZero(ftmp));
 
 		}else {
 			printf("Doing cvCalcBackProject()\n");
+//            反向投影处理
 			cvCalcBackProject(planes[1],dst,hist[0]);
  		}
 
         //DISPLAY
+//        显示结果
 		cvNamedWindow( "Model Image", 0 );
         cvShowImage(   "Model Image", src[0] );
         cvNamedWindow( "Model H-S Histogram", 0 );
