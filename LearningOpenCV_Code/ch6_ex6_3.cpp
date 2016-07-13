@@ -25,22 +25,36 @@
      http://tech.groups.yahoo.com/group/OpenCV/
    * The minutes of weekly OpenCV development meetings are at:
      http://pr.willowgarage.com/wiki/OpenCV
+ 
+ 
+ ADD ALL NOTES BY W_LITTLEWHITE
+ * The github is at:
+ https://github.com/964873559
+ 
    ************************************************** */
 
-#include <cv.h>
-#include <highgui.h>
+#include <opencv/cv.h>
+#include <opencv2/highgui.hpp>
 
+//透视变换
 int main(int argc, char** argv)
 {
+//    创建两个四元数组
    CvPoint2D32f srcQuad[4], dstQuad[4];
+//    创建3X3矩阵（必须）
    CvMat* warp_matrix = cvCreateMat(3,3,CV_32FC1);
    IplImage *src, *dst;
-    if( argc == 2 && ((src=cvLoadImage(argv[1],1)) != 0 ))
+//    如果图形加载成功
+    if((src=cvLoadImage(IMG1,1)) != 0 )
     {
+//        复制图像
    dst = cvCloneImage(src);
+//        设置原点
    dst->origin = src->origin;
+//        初始化元素值为0
    cvZero(dst);
 
+//        设定映射矩阵
    srcQuad[0].x = 0;           //src Top left
    srcQuad[0].y = 0;
    srcQuad[1].x = src->width - 1;  //src Top right
@@ -59,13 +73,17 @@ int main(int argc, char** argv)
    dstQuad[3].x = src->width*0.8;  //dst Bot right
    dstQuad[3].y = src->height*0.9;
 
+//        创建透视映射矩阵
    cvGetPerspectiveTransform(srcQuad,dstQuad,
                                      warp_matrix);
+//        透视变换
    cvWarpPerspective(src,dst,warp_matrix);
+//        显示结果
    cvNamedWindow( "Perspective_Warp", 1 );
       cvShowImage( "Perspective_Warp", dst );
       cvWaitKey();
     }
+//    释放内存
    cvReleaseImage(&dst);
    cvReleaseMat(&warp_matrix);
     return 0;

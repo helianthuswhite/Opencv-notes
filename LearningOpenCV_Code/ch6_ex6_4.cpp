@@ -33,23 +33,35 @@
      http://tech.groups.yahoo.com/group/OpenCV/
    * The minutes of weekly OpenCV development meetings are at:
      http://pr.willowgarage.com/wiki/OpenCV
+ 
+ 
+ ADD ALL NOTES BY W_LITTLEWHITE
+ * The github is at:
+ https://github.com/964873559
+ 
    ************************************************** */
-#include <cv.h>
-#include <highgui.h>
+#include <opencv/cv.h>
+#include <opencv2/highgui.hpp>
 
+//对数极坐标变换
 int main(int argc, char** argv)
 {
     IplImage* src;
-   double M; 
-    if( argc == 3 && ((src=cvLoadImage(argv[1],1)) != 0 ))
+   double M;
+//    加载图像
+    if((src=cvLoadImage(IMG1,1)) != 0 )
     {
-      M = atof(argv[2]);
+//        设置缩放比例
+      M = 0.5;
+//        创建目标图像
         IplImage* dst = cvCreateImage( cvGetSize(src), 8, 3 );
         IplImage* src2 = cvCreateImage( cvGetSize(src), 8, 3 );
-        cvLogPolar( src,  dst, cvPoint2D32f(src->width/2,src->height/2),  
+//        以两种不同的方式进行变换
+        cvLogPolar( src,  dst, cvPoint2D32f(src->width/2,src->height/2),
                     M, CV_INTER_LINEAR+CV_WARP_FILL_OUTLIERS );
         cvLogPolar( dst, src2, cvPoint2D32f(src->width/2,src->height/2),
                     M, CV_INTER_LINEAR+CV_WARP_INVERSE_MAP );
+//        显示结果
         cvNamedWindow( "log-polar", 1 );
         cvShowImage( "log-polar", dst );
         cvNamedWindow( "inverse log-polar", 1 );
