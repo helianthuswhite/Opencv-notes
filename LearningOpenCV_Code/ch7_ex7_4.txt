@@ -21,11 +21,17 @@
      http://tech.groups.yahoo.com/group/OpenCV/
    * The minutes of weekly OpenCV development meetings are at:
      http://pr.willowgarage.com/wiki/OpenCV
+
+
+ADD ALL NOTES BY W_LITTLEWHITE
+* The github is at:
+https://github.com/964873559
+
    ************************************************** */
    
 //Example 7-4. Using EMD to measure the similarity between distributions
 // Do EMD AND REPORT
-//
+//利用EMD来度量两个分布之间的相似性
 float emd = cvCalcEMD2(sig1,sig2,CV_DIST_L2);
 printf(“%f; ”,emd);
 
