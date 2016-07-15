@@ -30,13 +30,24 @@
      http://tech.groups.yahoo.com/group/OpenCV/
    * The minutes of weekly OpenCV development meetings are at:
      http://pr.willowgarage.com/wiki/OpenCV
+ 
+ 
+ ADD ALL NOTES BY W_LITTLEWHITE
+ * The github is at:
+ https://github.com/964873559
+ 
+
    ************************************************** */
 
-#include <cv.h>
-#include <highgui.h>
+#include <opencv/cv.h>
+#include <opencv2/highgui.hpp>
 #include <stdio.h>
 #include <stdlib.h>
 
+
+#define IMAGE "/Users/W_littlewhite/Documents/Xcode Project/Xcode Project/images/kuaicang.jpg"
+
+//==整了一晚上的逆透视变换，结果发现这一小节有，MDZZ
 void help(){
 	printf("Birds eye view\n\n"
 			"  birdseye board_w board_h intrinsics_mat.xml distortion_mat.xml checker_image \n\n"
@@ -48,44 +59,55 @@ void help(){
 			" ADJUST VIEW HEIGHT using keys 'u' up, 'd' down. ESC to quit.\n\n");
 }
 
+//逆透视变换转变鸟瞰图
 int main(int argc, char* argv[]) {
-	if(argc != 6){
-		printf("\nERROR: too few parameters\n");
-		help();
-		return -1;
-	}
-	help();
+////    6个参数==
+//	if(argc != 6){
+//		printf("\nERROR: too few parameters\n");
+//		help();
+//		return -1;
+//	}
+//	help();
 	//INPUT PARAMETERS:
-	int board_w = atoi(argv[1]);
-	int board_h = atoi(argv[2]);
+//    获取输入的参数
+	int board_w = 500;
+	int board_h = 500;
 	int board_n  = board_w * board_h;
+//    设置鸟瞰区域大小
 	CvSize board_sz = cvSize( board_w, board_h );
+//    加载参数配置文件
 	CvMat *intrinsic = (CvMat*)cvLoad(argv[3]);
     CvMat *distortion = (CvMat*)cvLoad(argv[4]);
 	IplImage *image = 0, *gray_image = 0;
-	if((image = cvLoadImage(argv[5]))== 0){
+	if((image = cvLoadImage(IMAGE))== 0){
 		printf("Error: Couldn't load %s\n",argv[5]);
 		return -1;
 	}
+//    创建灰度单通道图像
 	gray_image = cvCreateImage(cvGetSize(image),8,1);
     cvCvtColor(image, gray_image, CV_BGR2GRAY);
 
 	//UNDISTORT OUR IMAGE
+//    用于摄像机标定和三维重建
     IplImage* mapx = cvCreateImage( cvGetSize(image), IPL_DEPTH_32F, 1 );
     IplImage* mapy = cvCreateImage( cvGetSize(image), IPL_DEPTH_32F, 1 );
+//    参数为：摄像机内参数矩阵、畸变系数向量、x坐标对应矩阵、y坐标对应矩阵
     cvInitUndistortMap(
       intrinsic,
       distortion,
       mapx,
       mapy
     );
+//    对图像进行几何变换
 	IplImage *t = cvCloneImage(image);
     cvRemap( t, image, mapx, mapy );
 
 	//GET THE CHECKERBOARD ON THE PLANE
+//    将棋盘（图像）放置到地面
 	cvNamedWindow("Checkers");
     CvPoint2D32f* corners = new CvPoint2D32f[ board_n ];
     int corner_count = 0;
+//    寻找棋盘图内角点的位置
     int found = cvFindChessboardCorners(
         image,
         board_sz,
@@ -99,13 +121,15 @@ int main(int argc, char* argv[]) {
 		return -1;
 	}
 	//Get Subpixel accuracy on those corners
-	cvFindCornerSubPix(gray_image, corners, corner_count, 
+//    检测亚像素级的角点
+	cvFindCornerSubPix(gray_image, corners, corner_count,
 			  cvSize(11,11),cvSize(-1,-1), 
 			  cvTermCriteria( CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 30, 0.1 ));
 
 	//GET THE IMAGE AND OBJECT POINTS:
 	//Object points are at (r,c): (0,0), (board_w-1,0), (0,board_h-1), (board_w-1,board_h-1)
 	//That means corners are at: corners[r*board_w + c]
+//    获得图像以及对象点
 	CvPoint2D32f objPts[4], imgPts[4];
 	objPts[0].x = 0;         objPts[0].y = 0; 
 	objPts[1].x = board_w-1; objPts[1].y = 0; 
@@ -117,6 +141,7 @@ int main(int argc, char* argv[]) {
 	imgPts[3] = corners[(board_h-1)*board_w + board_w-1];
 
 	//DRAW THE POINTS in order: B,G,R,YELLOW
+//    按顺序绘制相关点
 	cvCircle(image,cvPointFrom32f(imgPts[0]),9,CV_RGB(0,0,255),3);
 	cvCircle(image,cvPointFrom32f(imgPts[1]),9,CV_RGB(0,255,0),3);
 	cvCircle(image,cvPointFrom32f(imgPts[2]),9,CV_RGB(255,0,0),3);
@@ -168,7 +193,7 @@ int main(int argc, char* argv[]) {
 	//SAVE AND EXIT
 	cvSave("Rot.xml",Rot);
 	cvSave("Trans.xml",Trans);
-	cvSave("H.xml",H);
+	cvSave("H.xml",H); 
 	cvInvert(H,H_invt);
     cvSave("H_invt.xml",H_invt); //Bottom row of H invert is horizon line
 	return 0;
