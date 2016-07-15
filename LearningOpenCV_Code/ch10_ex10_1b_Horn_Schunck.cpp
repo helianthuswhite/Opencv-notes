@@ -24,17 +24,26 @@
      http://tech.groups.yahoo.com/group/OpenCV/
    * The minutes of weekly OpenCV development meetings are at:
      http://pr.willowgarage.com/wiki/OpenCV
+ 
+ 
+ ADD ALL NOTES BY W_LITTLEWHITE
+ * The github is at:
+ https://github.com/964873559
+
    ************************************************** */
 
 //
 
-#include "cv.h"
-#include "highgui.h"
+#include "opencv/cv.h"
+//这个头文件要加上，例子里面没有，呼呼报错
+#include "opencv2/legacy/legacy.hpp"
+#include "opencv2/highgui.hpp"
 #include <math.h>
 #include <stdio.h>
 #define CVX_GRAY50 cvScalar(100)
 #define CVX_WHITE  cvScalar(255)
 
+//稠密跟踪的Horn-Schunck方法
 int main(int argc, char** argv)
 {
     // Initialize, load two images from the file system, and
@@ -42,16 +51,17 @@ int main(int argc, char** argv)
     // results.
 
     // exit if no input images
+//    加载图像，分配内存
 	 IplImage *imgA = 0, *imgB = 0;
-    imgA = cvLoadImage("OpticalFlow0.jpg",0);
-    imgB = cvLoadImage("OpticalFlow1.jpg",0);
+    imgA = cvLoadImage("/Users/W_littlewhite/Documents/Xcode Project/Xcode Project/LearningOpenCV_Code/OpticalFlow0.jpg",0);
+    imgB = cvLoadImage("/Users/W_littlewhite/Documents/Xcode Project/Xcode Project/LearningOpenCV_Code/OpticalFlow1.jpg",0);
     if(!(imgA)||!(imgB)){ printf("One of OpticalFlow0.jpg and/or OpticalFlow1.jpg didn't load\n"); return -1;}
-
+//    参数的初始化
     IplImage* velx = cvCreateImage(cvGetSize(imgA),IPL_DEPTH_32F,1);
     IplImage* vely = cvCreateImage(cvGetSize(imgA),IPL_DEPTH_32F,1);
 
     IplImage* imgC = cvCreateImage(cvGetSize(imgA),IPL_DEPTH_8U,3);
-
+//    先显示一波图像
     cvNamedWindow( "OpticalFlow0" );
     cvNamedWindow( "OpticalFlow1" );
     cvNamedWindow( "Flow Results" );
@@ -60,7 +70,7 @@ int main(int argc, char** argv)
     cvShowImage( "OpticalFlow1",imgB );
 
     // Call the actual Horn and Schunck algorithm
-    //
+    //执行算法，参数：输入输出为8位单通道图像，计算新速度的初始值，x、y方向的速度，与Lagrange乘子相关的权重，终止条件
     cvCalcOpticalFlowHS( 
         imgA, 
         imgB, 
@@ -76,7 +86,7 @@ int main(int argc, char** argv)
     );
 
     // Now make some image of what we are looking at:
-    //
+    //绘制我们想要看到的结果
     cvZero( imgC );
     int step = 4;
     for( int y=0; y<imgC->height; y += step ) {
@@ -103,11 +113,13 @@ int main(int argc, char** argv)
         }
     }
     // show tracking
+//    显示一波最后的结果
     cvShowImage( "Flow Results",imgC );
     
     cvWaitKey(0);
 
     // destroy windows
+//    各回各家，各找各妈
     cvDestroyWindow( "OpticalFlow0" );
     cvDestroyWindow( "OpticalFlow1" );
     cvDestroyWindow( "Flow Results" );

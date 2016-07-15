@@ -23,32 +23,41 @@
      http://tech.groups.yahoo.com/group/OpenCV/
    * The minutes of weekly OpenCV development meetings are at:
      http://pr.willowgarage.com/wiki/OpenCV
+ 
+ 
+ ADD ALL NOTES BY W_LITTLEWHITE
+ * The github is at:
+ https://github.com/964873559
+
+ 
    ************************************************** */
 
-#include <cv.h>
-#include <cxcore.h>
-#include <highgui.h>
+#include <opencv/cv.h>
+#include <opencv/cxcore.h>
+#include <opencv2/highgui.hpp>
 #include <stdio.h>
 
+//金字塔Lucas-Kanade光流代码
 const int MAX_CORNERS = 500;
 int main(int argc, char** argv) {
    // Initialize, load two images from the file system, and
    // allocate the images and other structures we will need for
    // results.
-	//
-	IplImage* imgA = cvLoadImage("OpticalFlow0.jpg",CV_LOAD_IMAGE_GRAYSCALE);
-	IplImage* imgB = cvLoadImage("OpticalFlow1.jpg",CV_LOAD_IMAGE_GRAYSCALE);
+	//初始化，加载两张图像，分配我们所需要的内存
+	IplImage* imgA = cvLoadImage("/Users/W_littlewhite/Documents/Xcode Project/Xcode Project/LearningOpenCV_Code/OpticalFlow0.jpg",CV_LOAD_IMAGE_GRAYSCALE);
+	IplImage* imgB = cvLoadImage("/Users/W_littlewhite/Documents/Xcode Project/Xcode Project/LearningOpenCV_Code/OpticalFlow1.jpg",CV_LOAD_IMAGE_GRAYSCALE);
 	CvSize      img_sz    = cvGetSize( imgA );
 	int         win_size = 10;
-	IplImage* imgC = cvLoadImage("OpticalFlow1.jpg",CV_LOAD_IMAGE_UNCHANGED);
+	IplImage* imgC = cvLoadImage("/Users/W_littlewhite/Documents/Xcode Project/Xcode Project/LearningOpenCV_Code/OpticalFlow1.jpg",CV_LOAD_IMAGE_UNCHANGED);
 	
 	// The first thing we need to do is get the features
 	// we want to track.
-	//
+	//我们首先要做的是获取到角点
 	IplImage* eig_image = cvCreateImage( img_sz, IPL_DEPTH_32F, 1 );
 	IplImage* tmp_image = cvCreateImage( img_sz, IPL_DEPTH_32F, 1 );
 	int              corner_count = MAX_CORNERS;
 	CvPoint2D32f* cornersA        = new CvPoint2D32f[ MAX_CORNERS ];
+//    获取角点函数，参数为：8位或32位单通道图图像，2、3参数是大小与输入相同的32位单通道图像，函数输出32位角点数组，检测到的角点数目，角点可接受的最小特征值，角点之间的最小距离，指定输入图像中参与角点计算的像素点，计算导数自相关矩阵时指定点的领域，设定角点的定义，设置Hession自相关矩阵对Hessian行列式相对权重的权重系数
 	cvGoodFeaturesToTrack(
 		imgA,
 		eig_image,
@@ -62,6 +71,7 @@ int main(int argc, char** argv) {
 		0,
 		0.04
 	);
+//    寻找亚像素精度的角点位置，参数为：输入8位单通道灰度图像，角点的初始位置，角点的数目，等式产生窗口的位置，输入禁区，迭代终止条件
 	cvFindCornerSubPix(
 		imgA,
 		cornersA,
@@ -71,13 +81,14 @@ int main(int argc, char** argv) {
 		cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,20,0.03)
 	);
 	// Call the Lucas Kanade algorithm
-	//
+	//执行LK光流算法
 	char features_found[ MAX_CORNERS ];
 	float feature_errors[ MAX_CORNERS ];
 	CvSize pyr_sz = cvSize( imgA->width+8, imgB->height/3 );
 	IplImage* pyrA = cvCreateImage( pyr_sz, IPL_DEPTH_32F, 1 );
   IplImage* pyrB = cvCreateImage( pyr_sz, IPL_DEPTH_32F, 1 );
   CvPoint2D32f* cornersB        = new CvPoint2D32f[ MAX_CORNERS ];
+//    参数为：初始图像，最终图像，3、4为申请存放图像的金字塔缓存，用于寻找位置的点，存放新的位置点，寻找位置点的数目，创建运动窗口的尺寸，金字塔的栈层数，在第二幅图像中是否发现相应点的状态，被跟踪点的原始图像小区域与此点在第二幅图像小区域间的差的数组，可以删除那些局部外观小区域随点运动变化剧烈的点，终止条件，细微控制
   cvCalcOpticalFlowPyrLK(
      imgA,
      imgB,
@@ -94,7 +105,7 @@ int main(int argc, char** argv) {
      0
   );
   // Now make some image of what we are looking at:
-  //
+  //产生一些我们顶着的图像，绘制出运动变化的点
   for( int i=0; i<corner_count; i++ ) {
      if( features_found[i]==0|| feature_errors[i]>550 ) {
  //       printf("Error is %f/n",feature_errors[i]);
@@ -111,6 +122,7 @@ int main(int argc, char** argv) {
      );
      cvLine( imgC, p0, p1, CV_RGB(255,0,0),2 );
   }
+//    显示一波结果
   cvNamedWindow("ImageA",0);
   cvNamedWindow("ImageB",0);
   cvNamedWindow("LKpyr_OpticalFlow",0);

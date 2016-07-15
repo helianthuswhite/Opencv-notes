@@ -35,7 +35,7 @@
 //
 //-------------------------------------------------------------------------------
 #pragma once
-#include <cv.h>
+#include <opencv/cv.h>
 
 #define CVX_DONT_CARE -1
 
