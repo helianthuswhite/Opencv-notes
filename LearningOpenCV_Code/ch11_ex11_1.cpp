@@ -1,8 +1,8 @@
 // Example 11-1. Reading a chessboard’s width and height, reading and collecting the 
 //               requested number of views, and calibrating the camera
-//
-#include <cv.h>
-#include <highgui.h>
+//读入棋盘的宽度和高度，读入收集到的不同场景图像，然后标定摄像机
+#include <opencv/cv.h>
+#include <opencv2/highgui.hpp>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -46,6 +46,12 @@ printf("\n\n"
      http://tech.groups.yahoo.com/group/OpenCV/
    * The minutes of weekly OpenCV development meetings are at:
      http://pr.willowgarage.com/wiki/OpenCV
+ 
+ 
+ ADD ALL NOTES BY W_LITTLEWHITE
+ * The github is at:
+ https://github.com/964873559
+
    ************************************************** */
 //
 int n_boards = 0; //Will be set by input list
@@ -57,6 +63,7 @@ int main(int argc, char* argv[]) {
   CvCapture* capture;// = cvCreateCameraCapture( 0 );
  // assert( capture );
 
+//    获取输入的参数
   if(argc != 5){
     printf("\nERROR: Wrong number of input parameters");
     help();
@@ -66,7 +73,7 @@ int main(int argc, char* argv[]) {
   board_h  = atoi(argv[2]);
   n_boards = atoi(argv[3]);
   board_dt = atoi(argv[4]);
-  
+//  创建棋盘
   int board_n  = board_w * board_h;
   CvSize board_sz = cvSize( board_w, board_h );
   capture = cvCreateCameraCapture( 0 );
@@ -75,6 +82,7 @@ int main(int argc, char* argv[]) {
   cvNamedWindow( "Calibration" );
   cvNamedWindow( "Raw Video");
   //ALLOCATE STORAGE
+//    分配内存，创建各种标定参数
   CvMat* image_points      = cvCreateMat(n_boards*board_n,2,CV_32FC1);
   CvMat* object_points     = cvCreateMat(n_boards*board_n,3,CV_32FC1);
   CvMat* point_counts      = cvCreateMat(n_boards,1,CV_32SC1);
@@ -85,36 +93,42 @@ int main(int argc, char* argv[]) {
   int corner_count;
   int successes = 0;
   int step, frame = 0;
-
+    
   IplImage *image = cvQueryFrame( capture );
   IplImage *gray_image = cvCreateImage(cvGetSize(image),8,1);//subpixel
  
   // CAPTURE CORNER VIEWS LOOP UNTIL WE’VE GOT n_boards 
   // SUCCESSFUL CAPTURES (ALL CORNERS ON THE BOARD ARE FOUND)
-  //
+  //捕获角点图，直到我们能够获得了n_boards个
   help();
   while(successes < n_boards) {
     //Skip every board_dt frames to allow user to move chessboard
+//      跳过90帧的图像，让用户能够移动棋盘
     if((frame++ % board_dt) == 0) {
        //Find chessboard corners:
+//        寻找棋盘角点
        int found = cvFindChessboardCorners(
                 image, board_sz, corners, &corner_count, 
                 CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FILTER_QUADS
        );
 
        //Get Subpixel accuracy on those corners
+//        寻找亚像素角点
        cvCvtColor(image, gray_image, CV_BGR2GRAY);
        cvFindCornerSubPix(gray_image, corners, corner_count, 
                   cvSize(11,11),cvSize(-1,-1), cvTermCriteria(    
                   CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 30, 0.1 ));
 
        //Draw it
-       cvDrawChessboardCorners(image, board_sz, corners, 
+//        画出所有角点
+       cvDrawChessboardCorners(image, board_sz, corners,
                   corner_count, found);
  //      cvShowImage( "Calibration", image );
    
        // If we got a good board, add it to our data
+//        如果我们采集到了合适的板，将其添加到我们的数据中
        if( corner_count == board_n ) {
+//           将我们找到的可用图显示成彩色的
           cvShowImage( "Calibration", image ); //show in color if we did collect the image
           step = successes*board_n;
           for( int i=step, j=0; j<board_n; ++i,++j ) {
@@ -129,10 +143,12 @@ int main(int argc, char* argv[]) {
           printf("Collected our %d of %d needed chessboard images\n",successes,n_boards);
        }
        else
+//           不适合的的图像显示成灰色
          cvShowImage( "Calibration", gray_image ); //Show Gray if we didn't collect the image
     } //end skip board_dt between chessboard capture
 
     //Handle pause/unpause and ESC
+//      P键暂停，ESC退出
     int c = cvWaitKey(15);
     if(c == 'p'){  
        c = 0;
@@ -145,13 +161,16 @@ int main(int argc, char* argv[]) {
     image = cvQueryFrame( capture ); //Get next image
     cvShowImage("Raw Video", image);
   } //END COLLECTION WHILE LOOP.
+//    停止循环
   cvDestroyWindow("Calibration");
   printf("\n\n*** CALLIBRATING THE CAMERA...");
   //ALLOCATE MATRICES ACCORDING TO HOW MANY CHESSBOARDS FOUND
+//    根据找到的棋盘分配矩阵
   CvMat* object_points2  = cvCreateMat(successes*board_n,3,CV_32FC1);
   CvMat* image_points2   = cvCreateMat(successes*board_n,2,CV_32FC1);
   CvMat* point_counts2   = cvCreateMat(successes,1,CV_32SC1);
   //TRANSFER THE POINTS INTO THE CORRECT SIZE MATRICES
+//    把所有的点转变成合适大小的矩阵
   for(int i = 0; i<successes*board_n; ++i){
       CV_MAT_ELEM( *image_points2, float, i, 0) = 
              CV_MAT_ELEM( *image_points, float, i, 0);
@@ -163,7 +182,8 @@ int main(int argc, char* argv[]) {
              CV_MAT_ELEM( *object_points, float, i, 1) ;
       CV_MAT_ELEM( *object_points2, float, i, 2) = 
              CV_MAT_ELEM( *object_points, float, i, 2) ;
-  } 
+  }
+//    这里所有的数字都相同
   for(int i=0; i<successes; ++i){ //These are all the same number
     CV_MAT_ELEM( *point_counts2, int, i, 0) = 
              CV_MAT_ELEM( *point_counts, int, i, 0);
@@ -175,11 +195,13 @@ int main(int argc, char* argv[]) {
   // At this point we have all of the chessboard corners we need.
   // Initialize the intrinsic matrix such that the two focal
   // lengths have a ratio of 1.0
-  //
+  //在这里我们已经获得我们所需要的所有角点了
+//    接着我们要初始化机内参数矩阵使得两个焦距长度比率为1.0
   CV_MAT_ELEM( *intrinsic_matrix, float, 0, 0 ) = 1.0f;
   CV_MAT_ELEM( *intrinsic_matrix, float, 1, 1 ) = 1.0f;
 
   //CALIBRATE THE CAMERA!
+//    开始矫正摄像机
   cvCalibrateCamera2(
       object_points2, image_points2,
       point_counts2,  cvGetSize( image ),
@@ -188,17 +210,19 @@ int main(int argc, char* argv[]) {
   );
 
   // SAVE THE INTRINSICS AND DISTORTIONS
+//    保存几内参数和畸变参数
   printf(" *** DONE!\n\nStoring Intrinsics.xml and Distortions.xml files\n\n");
   cvSave("Intrinsics.xml",intrinsic_matrix);
   cvSave("Distortion.xml",distortion_coeffs);
 
   // EXAMPLE OF LOADING THESE MATRICES BACK IN:
+//    加载一波参数的例子
   CvMat *intrinsic = (CvMat*)cvLoad("Intrinsics.xml");
   CvMat *distortion = (CvMat*)cvLoad("Distortion.xml");
 
   // Build the undistort map which we will use for all 
   // subsequent frames.
-  //
+  //创建和初始化矫正map
   IplImage* mapx = cvCreateImage( cvGetSize(image), IPL_DEPTH_32F, 1 );
   IplImage* mapy = cvCreateImage( cvGetSize(image), IPL_DEPTH_32F, 1 );
   cvInitUndistortMap(
@@ -209,16 +233,20 @@ int main(int argc, char* argv[]) {
   );
   // Just run the camera to the screen, now showing the raw and
   // the undistorted image.
-  //
+  //运行摄像机，看看原来的图像和矫正后的图像
   cvNamedWindow( "Undistort" );
   while(image) {
     IplImage *t = cvCloneImage(image);
+//      显示原生的图像
     cvShowImage( "Raw Video", image ); // Show raw image
+//      矫正图像
     cvRemap( t, image, mapx, mapy );     // Undistort image
     cvReleaseImage(&t);
+//      显示矫正后的图像
     cvShowImage("Undistort", image);     // Show corrected image
 
     //Handle pause/unpause and ESC
+//      P键暂停，ESC键退出
     int c = cvWaitKey(15);
     if(c == 'p'){ 
        c = 0;
