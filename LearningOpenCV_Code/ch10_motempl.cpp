@@ -23,16 +23,28 @@
      http://tech.groups.yahoo.com/group/OpenCV/
    * The minutes of weekly OpenCV development meetings are at:
      http://pr.willowgarage.com/wiki/OpenCV
+ 
+ 
+ ADD ALL NOTES BY W_LITTLEWHITE
+ * The github is at:
+ https://github.com/964873559
+ 
    ************************************************** */
 
 
-#include "cv.h"
-#include "highgui.h"
+#include "opencv/cv.h"
+#include "opencv2/highgui.hpp"
 #include <time.h>
 #include <math.h>
 #include <ctype.h>
 #include <stdio.h>
 
+
+//这是一个使用摄像机来展示运动模板的例子
+//1 将摄像机放在远离你的地方
+//2 启动程序
+//3 等一会到视频窗口变黑
+//4 在摄像机前移动并观察模板上绘制的运动矢量
 void help()
 {
 printf("\n\n"
@@ -51,11 +63,13 @@ printf("\n\n"
 
 
 // various tracking parameters (in seconds)
+//各种跟踪参数
 const double MHI_DURATION = 1;
 const double MAX_TIME_DELTA = 0.5;
 const double MIN_TIME_DELTA = 0.05;
 // number of cyclic frame buffer used for motion detection
 // (should, probably, depend on FPS)
+//用于运动检测的环状帧缓冲器的数目（取决于你的FPS）
 const int N = 4;
 
 // ring image buffer
@@ -73,9 +87,12 @@ CvMemStorage* storage = 0; // temporary storage
 //  img - input video frame
 //  dst - resultant motion picture
 //  args - optional parameters
+//属性：图片——输入视频帧、目标——输出矢量图、可选的参数
 void  update_mhi( IplImage* img, IplImage* dst, int diff_threshold )
 {
+//    获得当前的秒级时间
     double timestamp = (double)clock()/CLOCKS_PER_SEC; // get current time in seconds
+//    获得当且视频帧大小
     CvSize size = cvSize(img->width,img->height); // get current frame size
     int i, idx1 = last, idx2;
     IplImage* silh;
@@ -89,6 +106,7 @@ void  update_mhi( IplImage* img, IplImage* dst, int diff_threshold )
 
     // allocate images at the beginning or
     // reallocate them if the frame size is changed
+//    分配图片内存，如果视频帧大小改变就重新分配
     if( !mhi || mhi->width != size.width || mhi->height != size.height ) {
         if( buf == 0 ) {
             buf = (IplImage**)malloc(N*sizeof(buf[0]));
@@ -112,24 +130,29 @@ void  update_mhi( IplImage* img, IplImage* dst, int diff_threshold )
         mask = cvCreateImage( size, IPL_DEPTH_8U, 1 );
     }
 
+//    视频帧转换为灰度图
     cvCvtColor( img, buf[last], CV_BGR2GRAY ); // convert frame to grayscale
 
     idx2 = (last + 1) % N; // index of (last - (N-1))th frame
     last = idx2;
 
     silh = buf[idx2];
+//    获得各帧之间的不同
     cvAbsDiff( buf[idx1], buf[idx2], silh ); // get difference between frames
-    
+//    二值化处理
     cvThreshold( silh, silh, diff_threshold, 1, CV_THRESH_BINARY ); // and threshold it
+//    更新MHI
     cvUpdateMotionHistory( silh, mhi, timestamp, MHI_DURATION ); // update MHI
 
     // convert MHI to blue 8u image
+//    把MHI插入到蓝色图像中
     cvCvtScale( mhi, mask, 255./MHI_DURATION,
                 (MHI_DURATION - timestamp)*255./MHI_DURATION );
     cvZero( dst );
     cvCvtPlaneToPix( mask, 0, 0, 0, dst );
 
     // calculate motion gradient orientation and valid orientation mask
+//    计算运动方向的梯度以及有效的方向蒙版
     cvCalcMotionGradient( mhi, mask, orient, MAX_TIME_DELTA, MIN_TIME_DELTA, 3 );
     
     if( !storage )
@@ -139,10 +162,13 @@ void  update_mhi( IplImage* img, IplImage* dst, int diff_threshold )
     
     // segment motion: get sequence of motion components
     // segmask is marked motion components map. It is not used further
+//    段运动：获得运动的组件序列
+//    segmask是被标记的运动组件地图，它之后不会再被使用
     seq = cvSegmentMotion( mhi, segmask, storage, timestamp, MAX_TIME_DELTA );
 
     // iterate through the motion components,
     // One more iteration (i == -1) corresponds to the whole image (global motion)
+//    通过运动分量迭代，与这个运动相比会多一次迭代
     for( i = -1; i < seq->total; i++ ) {
 
         if( i < 0 ) { // case of the whole image
@@ -151,7 +177,9 @@ void  update_mhi( IplImage* img, IplImage* dst, int diff_threshold )
             magnitude = 100;
         }
         else { // i-th motion component
+//            i-th运动部分
             comp_rect = ((CvConnectedComp*)cvGetSeqElem( seq, i ))->rect;
+//            很小的部分忽略
             if( comp_rect.width + comp_rect.height < 100 ) // reject very small components
                 continue;
             color = CV_RGB(255,0,0);
@@ -159,15 +187,18 @@ void  update_mhi( IplImage* img, IplImage* dst, int diff_threshold )
         }
 
         // select component ROI
+//        选择组件的ROI
         cvSetImageROI( silh, comp_rect );
         cvSetImageROI( mhi, comp_rect );
         cvSetImageROI( orient, comp_rect );
         cvSetImageROI( mask, comp_rect );
 
         // calculate orientation
+//        计算方向
         angle = cvCalcGlobalOrientation( orient, mask, mhi, timestamp, MHI_DURATION);
+//        调整图片左上角为原点
         angle = 360.0 - angle;  // adjust for images with top-left origin
-
+//        计算ROI轮廓中点的个数
         count = cvNorm( silh, 0, CV_L1, 0 ); // calculate number of points within silhouette ROI
 
         cvResetImageROI( mhi );
@@ -176,10 +207,12 @@ void  update_mhi( IplImage* img, IplImage* dst, int diff_threshold )
         cvResetImageROI( silh );
 
         // check for the case of little motion
+//        检查微小的运动
         if( count < comp_rect.width*comp_rect.height * 0.05 )
             continue;
 
         // draw a clock with arrow indicating the direction
+//        用箭头绘制一个指定方向的时钟
         center = cvPoint( (comp_rect.x + comp_rect.width/2),
                           (comp_rect.y + comp_rect.height/2) );
 
@@ -189,12 +222,12 @@ void  update_mhi( IplImage* img, IplImage* dst, int diff_threshold )
     }
 }
 
-
+//主程序开始
 int main(int argc, char** argv)
 {
     IplImage* motion = 0;
     CvCapture* capture = 0;
-    
+//    呼呼一顿获取参数
     if( argc == 1 || (argc == 2 && strlen(argv[1]) == 1 && isdigit(argv[1][0])))
         capture = cvCaptureFromCAM( argc == 2 ? argv[1][0] - '0' : 0 );
     else if( argc == 2 )
@@ -207,6 +240,7 @@ int main(int argc, char** argv)
         
         for(;;)
         {
+//            呼呼一顿迭代处理
             IplImage* image;
             if( !cvGrabFrame( capture ))
                 break;
@@ -221,7 +255,7 @@ int main(int argc, char** argv)
                     motion->origin = image->origin;
                 }
             }
-
+//            显示一波结果
             update_mhi( image, motion, 30 );
             cvShowImage( "Motion", motion );
 
