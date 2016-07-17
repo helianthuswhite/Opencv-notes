@@ -45,7 +45,9 @@
 #include <stdlib.h>
 
 
-#define IMAGE "/Users/W_littlewhite/Documents/Xcode Project/Xcode Project/images/kuaicang.jpg"
+#define IMAGE "/Users/W_littlewhite/Documents/Xcode Project/Xcode Project/LearningOpenCV_Code/ch12_birdseye.jpg"
+#define INTRINSIC "/Users/W_littlewhite/Documents/Xcode Project/Xcode Project/LearningOpenCV_Code/Intrinsics.xml"
+#define DISTORTION "/Users/W_littlewhite/Documents/Xcode Project/Xcode Project/LearningOpenCV_Code/Distortion.xml"
 
 //==整了一晚上的逆透视变换，结果发现这一小节有，MDZZ
 void help(){
@@ -70,17 +72,17 @@ int main(int argc, char* argv[]) {
 //	help();
 	//INPUT PARAMETERS:
 //    获取输入的参数
-	int board_w = 500;
-	int board_h = 500;
+	int board_w = 12;
+	int board_h = 12;
 	int board_n  = board_w * board_h;
 //    设置鸟瞰区域大小
 	CvSize board_sz = cvSize( board_w, board_h );
 //    加载参数配置文件
-	CvMat *intrinsic = (CvMat*)cvLoad(argv[3]);
-    CvMat *distortion = (CvMat*)cvLoad(argv[4]);
+	CvMat *intrinsic = (CvMat*)cvLoad(INTRINSIC);
+    CvMat *distortion = (CvMat*)cvLoad(DISTORTION);
 	IplImage *image = 0, *gray_image = 0;
 	if((image = cvLoadImage(IMAGE))== 0){
-		printf("Error: Couldn't load %s\n",argv[5]);
+		printf("Error: Couldn't load %s\n",IMAGE);
 		return -1;
 	}
 //    创建灰度单通道图像
@@ -148,24 +150,29 @@ int main(int argc, char* argv[]) {
 	cvCircle(image,cvPointFrom32f(imgPts[3]),9,CV_RGB(255,255,0),3);
 
 	//DRAW THE FOUND CHECKERBOARD
+//    绘制发现的棋盘
 	cvDrawChessboardCorners(image, board_sz, corners, corner_count, found);
     cvShowImage( "Checkers", image );
 
 	//FIND THE HOMOGRAPHY
+//    找到单应矩阵H
 	CvMat *H = cvCreateMat( 3, 3, CV_32F);
 	CvMat *H_invt = cvCreateMat(3,3,CV_32F);
 	cvGetPerspectiveTransform(objPts,imgPts,H);
 
 	//LET THE USER ADJUST THE Z HEIGHT OF THE VIEW
+//    调整Z轴视角高度
 	float Z = 25;
 	int key = 0;
 	IplImage *birds_image = cvCloneImage(image);
 	cvNamedWindow("Birds_Eye");
+    
     while(key != 27) {//escape key stops
 	   CV_MAT_ELEM(*H,float,2,2) = Z;
 //	   cvInvert(H,H_invt); //If you want to invert the homography directly
 //	   cvWarpPerspective(image,birds_image,H_invt,CV_INTER_LINEAR+CV_WARP_FILL_OUTLIERS );
 	   //USE HOMOGRAPHY TO REMAP THE VIEW
+//        进行密集透视变换获得鸟瞰图
 	   cvWarpPerspective(image,birds_image,H,
 			CV_INTER_LINEAR+CV_WARP_INVERSE_MAP+CV_WARP_FILL_OUTLIERS );
 	   cvShowImage("Birds_Eye", birds_image);
@@ -175,22 +182,25 @@ int main(int argc, char* argv[]) {
 	}
 
 	//SHOW ROTATION AND TRANSLATION VECTORS
+//    显示旋转和平移向量
 	CvMat* image_points  = cvCreateMat(4,1,CV_32FC2);
 	CvMat* object_points = cvCreateMat(4,1,CV_32FC3);
 	for(int i=0;i<4;++i){
 		CV_MAT_ELEM(*image_points,CvPoint2D32f,i,0) = imgPts[i];
 		CV_MAT_ELEM(*object_points,CvPoint3D32f,i,0) = cvPoint3D32f(objPts[i].x,objPts[i].y,0);
 	}
-
+//    获得摄像机的机外参数
 	CvMat *RotRodrigues   = cvCreateMat(3,1,CV_32F);
 	CvMat *Rot   = cvCreateMat(3,3,CV_32F);
 	CvMat *Trans = cvCreateMat(3,1,CV_32F);
 	cvFindExtrinsicCameraParams2(object_points,image_points,
 			intrinsic,distortion,
 			RotRodrigues,Trans);
+//    进行旋转矩阵和旋转向量直接的转化
 	cvRodrigues2(RotRodrigues,Rot);
 
 	//SAVE AND EXIT
+//    保存文件
 	cvSave("Rot.xml",Rot);
 	cvSave("Trans.xml",Trans);
 	cvSave("H.xml",H); 
