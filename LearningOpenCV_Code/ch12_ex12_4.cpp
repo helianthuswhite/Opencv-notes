@@ -23,13 +23,19 @@
      http://tech.groups.yahoo.com/group/OpenCV/
    * The minutes of weekly OpenCV development meetings are at:
      http://pr.willowgarage.com/wiki/OpenCV
+ 
+ 
+ ADD ALL NOTES BY W_LITTLEWHITE
+ * The github is at:
+ https://github.com/964873559
+ 
    ************************************************** */
 
-#include "cv.h"
-#include "highgui.h"
+#include "opencv/cv.h"
+#include "opencv2/highgui.hpp"
 #include <math.h>
 
-
+//2D直线拟合
 int main( int argc, char** argv )
 {
     IplImage* img = cvCreateImage( cvSize( 500, 500 ), 8, 3 );
@@ -54,6 +60,7 @@ int main( int argc, char** argv )
         b = MIN(a*0.3, b);
 
         // generate some points that are close to the line
+//        生成一些距离直线较近的点
         for( i = 0; i < count - outliers; i++ )
         {
             float x = (cvRandReal(&rng)*2-1)*a;
@@ -63,6 +70,7 @@ int main( int argc, char** argv )
         }
 
         // generate "completely off" points
+//        生成离群点
         for( ; i < count; i++ )
         {
             points[i].x = cvRandInt(&rng) % img->width;
@@ -70,15 +78,18 @@ int main( int argc, char** argv )
         }
 
         // find the optimal line
+//        找到最佳的直线
         cvFitLine( &pointMat, CV_DIST_L1, 1, 0.001, 0.001, line );
         cvZero( img );
 
         // draw the points
+//        画出那些点
         for( i = 0; i < count; i++ )
             cvCircle( img, points[i], 2, i < count - outliers ? CV_RGB(255, 0, 0) :
                 CV_RGB(255,255,0), CV_FILLED, CV_AA, 0 );
 
         // ... and the long enough line to cross the whole image
+//        足够长的线会穿过整张图像
         d = sqrt((double)line[0]*line[0] + (double)line[1]*line[1]);
         line[0] /= d;
         line[1] /= d;

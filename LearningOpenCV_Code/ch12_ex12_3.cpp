@@ -22,11 +22,17 @@
      http://tech.groups.yahoo.com/group/OpenCV/
    * The minutes of weekly OpenCV development meetings are at:
      http://pr.willowgarage.com/wiki/OpenCV
+ 
+ 
+ ADD ALL NOTES BY W_LITTLEWHITE
+ * The github is at:
+ https://github.com/964873559
+ 
    ************************************************** */
 
-#include "cv.h"
-#include "cxmisc.h"
-#include "highgui.h"
+#include "opencv/cv.h"
+#include "opencv/cxmisc.h"
+#include "opencv2/highgui.hpp"
 //#include "cvaux.h"
 #include <vector>
 #include <string>
@@ -43,14 +49,18 @@ using namespace std;
 // matrix separately) stereo. Calibrate the cameras and display the
 // rectified results along with the computed disparity images.
 //
+
+//立体标定、校正、匹配
 static void
 StereoCalib(const char* imageList, int nx, int ny, int useUncalibrated)
 {
     int displayCorners = 0;
     int showUndistorted = 1;
+//    OpenCV能够处理左右或者上下方式的摄像机
     bool isVerticalStereo = false;//OpenCV can handle left-right
                                       //or up-down camera arrangements
     const int maxScale = 1;
+//    把这个设置成你的实际区域的大小
     const float squareSize = 1.f; //Set this to your actual square size
     FILE* f = fopen(imageList, "rt");
     int i, j, lr, nframes, n = nx*ny, N = 0;
@@ -62,6 +72,7 @@ StereoCalib(const char* imageList, int nx, int ny, int useUncalibrated)
     vector<CvPoint2D32f> temp(n);
     CvSize imageSize = {0,0};
     // ARRAY AND VECTOR STORAGE:
+//    数组和向量存储、
     double M1[3][3], M2[3][3], D1[5], D2[5];
     double R[3][3], T[3], E[3][3], F[3][3];
     CvMat _M1 = cvMat(3, 3, CV_64F, M1 );
@@ -75,6 +86,7 @@ StereoCalib(const char* imageList, int nx, int ny, int useUncalibrated)
     if( displayCorners )
         cvNamedWindow( "corners", 1 );
 // READ IN THE LIST OF CHESSBOARDS:
+//    从棋盘图片列表文件中读取
     if( !f )
     {
         fprintf(stderr, "can not open file %s\n", imageList );
@@ -99,6 +111,7 @@ StereoCalib(const char* imageList, int nx, int ny, int useUncalibrated)
         imageSize = cvGetSize(img);
         imageNames[lr].push_back(buf);
     //FIND CHESSBOARDS AND CORNERS THEREIN:
+//        寻找棋盘以及其中的角点
         for( int s = 1; s <= maxScale; s++ )
         {
             IplImage* timg = img;
@@ -144,6 +157,7 @@ StereoCalib(const char* imageList, int nx, int ny, int useUncalibrated)
         if( result )
         {
          //Calibration will suffer without subpixel interpolation
+//            没有亚像素角点校准会出问题
             cvFindCornerSubPix( img, &temp[0], count,
                 cvSize(11, 11), cvSize(-1,-1),
                 cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS,
@@ -155,6 +169,7 @@ StereoCalib(const char* imageList, int nx, int ny, int useUncalibrated)
     fclose(f);
     printf("\n");
 // HARVEST CHESSBOARD 3D OBJECT POINT LIST:
+//    寻找到合适的棋盘的数量
     nframes = active[0].size();//Number of good chessboads found
     objectPoints.resize(nframes*n);
     for( i = 0; i < ny; i++ )
@@ -176,6 +191,7 @@ StereoCalib(const char* imageList, int nx, int ny, int useUncalibrated)
     cvZero(&_D2);
 
 // CALIBRATE THE STEREO CAMERAS
+//    校准垂直方向
     printf("Running stereo calibration ...");
     fflush(stdout);
     cvStereoCalibrate( &_objectPoints, &_imagePoints1,
@@ -193,6 +209,8 @@ StereoCalib(const char* imageList, int nx, int ny, int useUncalibrated)
 // includes all the output information,
 // we can check the quality of calibration using the
 // epipolar geometry constraint: m2^t*F*m1=0
+//    检查校准的质量
+//    由于输出的基础矩阵隐式的包含所有的输出信息，我们能够使用极几何约束来检验校准的质量
     vector<CvPoint3D32f> lines[2];
     points[0].resize(N);
     points[1].resize(N);
@@ -203,6 +221,7 @@ StereoCalib(const char* imageList, int nx, int ny, int useUncalibrated)
     CvMat _L1 = cvMat(1, N, CV_32FC3, &lines[0][0]);
     CvMat _L2 = cvMat(1, N, CV_32FC3, &lines[1][0]);
 //Always work in undistorted space
+//    在未失真的空间总会起作用
     cvUndistortPoints( &_imagePoints1, &_imagePoints1,
         &_M1, &_D1, 0, &_M1 );
     cvUndistortPoints( &_imagePoints2, &_imagePoints2,
@@ -220,6 +239,7 @@ StereoCalib(const char* imageList, int nx, int ny, int useUncalibrated)
     }
     printf( "avg err = %g\n", avgErr/(nframes*n) );
 //COMPUTE AND DISPLAY RECTIFICATION
+//    计算和显示修正的结果
     if( showUndistorted )
     {
         CvMat* mx1 = cvCreateMat( imageSize.height,
@@ -244,6 +264,7 @@ StereoCalib(const char* imageList, int nx, int ny, int useUncalibrated)
         CvMat _R1 = cvMat(3, 3, CV_64F, R1);
         CvMat _R2 = cvMat(3, 3, CV_64F, R2);
 // IF BY CALIBRATED (BOUGUET'S METHOD)
+//        如果被标定方法校正
         if( useUncalibrated == 0 )
         {
             CvMat _P1 = cvMat(3, 4, CV_64F, P1);
@@ -258,16 +279,19 @@ StereoCalib(const char* imageList, int nx, int ny, int useUncalibrated)
             cvInitUndistortRectifyMap(&_M2,&_D2,&_R2,&_P2,mx2,my2);
         }
 //OR ELSE HARTLEY'S METHOD
+//        或者是HARTLEY方法
         else if( useUncalibrated == 1 || useUncalibrated == 2 )
      // use intrinsic parameters of each camera, but
      // compute the rectification transformation directly
      // from the fundamental matrix
+//        使用每台摄像机的机内参数或者直接从基础矩阵中算出纠正的变化
         {
             double H1[3][3], H2[3][3], iM[3][3];
             CvMat _H1 = cvMat(3, 3, CV_64F, H1);
             CvMat _H2 = cvMat(3, 3, CV_64F, H2);
             CvMat _iM = cvMat(3, 3, CV_64F, iM);
     //Just to show you could have independently used F
+//            你能够单独使用F键
             if( useUncalibrated == 2 )
                 cvFindFundamentalMat( &_imagePoints1,
                 &_imagePoints2, &_F);
@@ -290,6 +314,7 @@ StereoCalib(const char* imageList, int nx, int ny, int useUncalibrated)
             assert(0);
         cvNamedWindow( "rectified", 1 );
 // RECTIFY THE IMAGES AND FIND DISPARITY MAPS
+//        校正图像并且找到视差图
         if( !isVerticalStereo )
             pair = cvCreateMat( imageSize.height, imageSize.width*2,
             CV_8UC3 );
@@ -297,6 +322,7 @@ StereoCalib(const char* imageList, int nx, int ny, int useUncalibrated)
             pair = cvCreateMat( imageSize.height*2, imageSize.width,
             CV_8UC3 );
 //Setup for finding stereo corrrespondences
+//        一步步的寻找垂直视差
         CvStereoBMState *BMState = cvCreateStereoBMState();
         assert(BMState != 0);
         BMState->preFilterSize=41;
@@ -322,6 +348,8 @@ StereoCalib(const char* imageList, int nx, int ny, int useUncalibrated)
               // image, so the epipolar lines in the rectified
               // images are vertical. Stereo correspondence
               // function does not support such a case.
+//                    当立体摄像机垂直正对时，useUncalibrated等于0不会颠倒图像
+//                    所以极线在校正的图像中是垂直的。立体像对方法不会支持这样的做法
                     cvFindStereoCorrespondenceBM( img1r, img2r, disp,
                         BMState);
                     cvNormalize( disp, vdisp, 0, 256, CV_MINMAX );
@@ -369,6 +397,7 @@ StereoCalib(const char* imageList, int nx, int ny, int useUncalibrated)
         cvReleaseMat( &disp );
     }
 }
+//主程序入口
 int main(void)
 {
     StereoCalib("ch12_list.txt", 9, 6, 1);
