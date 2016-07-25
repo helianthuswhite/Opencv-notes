@@ -94,7 +94,7 @@ int main( int argc, char** argv )
         line[0] /= d;
         line[1] /= d;
         t = (float)(img->width + img->height);
-        pt1.x = cvRound(line[2] - line[0]*t);
+        pt1.x = cvRound(line[2] - line[]*t);
         pt1.y = cvRound(line[3] - line[1]*t);
         pt2.x = cvRound(line[2] + line[0]*t);
         pt2.y = cvRound(line[3] + line[1]*t);

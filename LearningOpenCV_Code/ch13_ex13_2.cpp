@@ -1,11 +1,11 @@
 //
 // From OpenCV's samples/c directory
 //   Example 13-2. Creating and training a decision tree
-//
-#include "cxcore.h"
-#include "highgui.h"
+//创建并训练一棵决策树
+#include "opencv/cxcore.h"
+#include "opencv2/highgui.hpp"
 
-#include "ml.h"
+#include "opencv2/ml.hpp"
 #include <stdio.h>
 /* *************** License:**************************
    Oct. 3, 2008
@@ -30,6 +30,12 @@
      http://tech.groups.yahoo.com/group/OpenCV/
    * The minutes of weekly OpenCV development meetings are at:
      http://pr.willowgarage.com/wiki/OpenCV
+ 
+ 
+ ADD ALL NOTES BY W_LITTLEWHITE
+ * The github is at:
+ https://github.com/964873559
+
    ************************************************** */
 
 /*
