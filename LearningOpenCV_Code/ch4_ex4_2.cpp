@@ -2,7 +2,7 @@
 // user can draw boxes on the screen.
 //鬼头文件怎么跑到这里来了
 #include <opencv/cv.h>
-#include <opencv/highgui.hpp>
+#include <opencv2/highgui.hpp>
 #include <stdio.h>
  /* License:
    Oct. 3, 2008
