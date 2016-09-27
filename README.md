@@ -12,4 +12,4 @@ The leaning of the book《Learning Opencv》and all notes added
 # 注意
 代码中的参数传递部分已经被修改，为了运行方便
 
-具体的运行方法参见个人博客：http://www.helianthuswhite.cn/?p=111
+具体的运行方法参见个人博客：http://182.254.243.55/?p=111
